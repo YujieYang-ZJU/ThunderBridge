@@ -95,6 +95,8 @@ final class AppModel: ObservableObject {
     @Published var connected = false
     @Published var peerID = ""
     @Published var peerName = "另一台 Mac"
+    @Published private(set) var peerAddress: String?
+    @Published private(set) var openingScreenSharing = false
     @Published var remoteHome = ""
     @Published var path = ""
     @Published var pathDraft = ""
@@ -130,6 +132,8 @@ final class AppModel: ObservableObject {
     private var client: BridgeClient?
     private var browsingTask: Task<Void, Never>?
     private var connectionTask: Task<Void, Never>?
+    private var screenSharingTask: Task<Void, Never>?
+    private let screenSharingOpener: @MainActor (URL) async throws -> Void
     private var transferTask: Task<Void, Never>?
     private var preparationTask: Task<[Result<TransferPlan, Error>], Never>?
     private var activity: NSObjectProtocol?
@@ -146,7 +150,9 @@ final class AppModel: ObservableObject {
     }
     private static let activeIncoming = ["接收中", "校验中", "准备续传"]
 
-    init(stateDirectory: URL = LocalStateStore.defaultDirectory) {
+    init(stateDirectory: URL = LocalStateStore.defaultDirectory,
+         screenSharingOpener: @escaping @MainActor (URL) async throws -> Void = { try await ScreenSharing.open($0) }) {
+        self.screenSharingOpener = screenSharingOpener
         self.stateDirectory = stateDirectory
         self.stateURL = stateDirectory.appendingPathComponent("workspace-v3.json")
         localAddress = addresses.first?.address ?? ""
@@ -202,6 +208,7 @@ final class AppModel: ObservableObject {
     var canAdd: Bool { connected && !loading && writable && !preparing }
     var selectedEntries: [RemoteEntry] { visibleEntries.filter { selectedPaths.contains($0.path) } }
     var canDownload: Bool { connected && !loading && !preparing && !selectedEntries.isEmpty }
+    var canOpenScreenSharing: Bool { connected && peerAddress != nil && !openingScreenSharing }
     var hasTransfers: Bool { running || preparing || incoming.contains { Self.activeIncoming.contains($0.status) } }
     var networkLabel: String { addresses.first { $0.address == localAddress }?.label ?? "尚无可用网络地址" }
     var hasBridgeAddress: Bool { addresses.contains { $0.interface.hasPrefix("bridge") } }
@@ -321,6 +328,7 @@ final class AppModel: ObservableObject {
                 try Task.checkCancellation()
                 guard connectionGeneration == token else { return }
                 client = candidate; peerID = info.id; peerName = info.name; remoteHome = info.home
+                peerAddress = info.ipv4Address
                 host = configuration.host; port = String(configuration.port)
                 apply(listing); connected = true; discoveryStatus = "已连接，可上传与下载。"; saveNow()
             } catch {
@@ -335,11 +343,34 @@ final class AppModel: ObservableObject {
         if pauseAutomatic { automaticConnectionPaused = true }
         connectionGeneration = UUID(); automaticConnectionTask?.cancel()
         connectionTask?.cancel(); browsingTask?.cancel(); transferTask?.cancel(); preparationTask?.cancel()
+        screenSharingTask?.cancel(); screenSharingTask = nil
+        peerAddress = nil; openingScreenSharing = false
         connecting = false; connected = false; connectedSession = nil; client = nil
         entries = []; selectedPaths = []; path = ""; pathDraft = ""; loading = false
         for index in jobs.indices { jobs[index].approved = false }
         if sharing { discoveryStatus = "连接已断开，点选设备即可重新连接。" }
         saveNow()
+    }
+    func openScreenSharing() {
+        guard canOpenScreenSharing, let client else { return }
+        let token = connectionGeneration, identity = peerID
+        openingScreenSharing = true
+        screenSharingTask = Task {
+            defer { if connectionGeneration == token { openingScreenSharing = false; screenSharingTask = nil } }
+            do {
+                // Refresh the actual address and device before handing the session to macOS.
+                let info = try await client.hello()
+                try Task.checkCancellation()
+                guard connected, connectionGeneration == token else { return }
+                guard info.id == identity else { throw BridgeError("此地址已是另一台设备，请重新连接后再试。") }
+                peerAddress = info.ipv4Address
+                let url = try ScreenSharing.connectionURL(address: info.ipv4Address)
+                try await screenSharingOpener(url)
+            } catch {
+                guard !Task.isCancelled, connectionGeneration == token else { return }
+                self.error = "无法打开屏幕共享：\(error.localizedDescription)"
+            }
+        }
     }
     private func apply(_ listing: DirectoryListing) {
         path = listing.path; pathDraft = listing.path; entries = listing.entries; writable = listing.writable; search = ""; selectedPaths = []

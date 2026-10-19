@@ -62,7 +62,7 @@ public struct AuditReport: Codable, Sendable {
     public let exportedAt: Date
     public let jobs: [AuditJob]
     public init(jobs: [AuditJob], exportedAt: Date = Date()) {
-        self.schemaVersion = 1; self.applicationVersion = "0.4.1"
+        self.schemaVersion = 1; self.applicationVersion = "0.5.0"
         self.jobs = jobs; self.exportedAt = exportedAt
     }
     public func json() throws -> Data {

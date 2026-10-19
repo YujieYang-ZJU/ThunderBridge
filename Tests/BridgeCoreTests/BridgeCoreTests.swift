@@ -89,6 +89,7 @@ final class BridgeCoreTests {
     @Test func testCodeFreeHelloAndFullFilesystemBrowsing() async throws {
         let hello = try await client.hello()
         expectFalse(hello.name.isEmpty)
+        #expect(hello.ipv4Address == "127.0.0.1")
         expectEqual(hello.home, FileManager.default.homeDirectoryForCurrentUser.path)
         let root = try await client.list("/")
         expectTrue(root.entries.contains { $0.name == "Users" })

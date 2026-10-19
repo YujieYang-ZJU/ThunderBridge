@@ -8,14 +8,14 @@
     <img src="https://img.shields.io/badge/Apple_Silicon_%2B_Intel-Universal-5965DC?style=flat-square" alt="Apple Silicon 与 Intel 通用版">
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-6974DE?style=flat-square" alt="MIT License"></a>
   </p>
-  <p><a href="https://github.com/YujieYang-ZJU/ThunderBridge/releases/download/v0.4.1/ThunderBridge-v0.4.1-macOS-universal.dmg"><strong>下载 macOS 版 ↗</strong></a>　·　<a href="#开始使用">开始使用</a>　·　<a href="https://github.com/YujieYang-ZJU/ThunderBridge/releases">版本记录</a></p>
+  <p><a href="https://github.com/YujieYang-ZJU/ThunderBridge/releases/download/v0.5.0/ThunderBridge-v0.5.0-macOS-universal.dmg"><strong>下载 macOS 版 ↗</strong></a>　·　<a href="#开始使用">开始使用</a>　·　<a href="https://github.com/YujieYang-ZJU/ThunderBridge/releases">版本记录</a></p>
 </div>
 
 <br>
 
 ![雷桥操作演示：浏览文件、展开传输队列、切换宽屏浏览](docs/images/demo.gif)
 
-<p align="center"><sub>真实应用界面，使用独立演示数据。设备名、地址、目录与文件均为示例，不包含私人文件信息。</sub></p>
+<p align="center"><sub>v0.4.1 真实应用界面，使用独立演示数据；尚未展示 v0.5.0 的屏幕共享按钮。设备名、地址、目录与文件均为示例，不包含私人文件信息。</sub></p>
 
 <details>
 <summary>查看主界面静态截图</summary>
@@ -43,7 +43,7 @@
 
 ### 01 · 拖一下，安装完成
 
-下载 [ThunderBridge-v0.4.1-macOS-universal.dmg](https://github.com/YujieYang-ZJU/ThunderBridge/releases/download/v0.4.1/ThunderBridge-v0.4.1-macOS-universal.dmg)，双击打开，将 **雷桥** 拖到 **Applications（应用程序）**。安装后推出磁盘映像，从「应用程序」启动。
+下载 [ThunderBridge-v0.5.0-macOS-universal.dmg](https://github.com/YujieYang-ZJU/ThunderBridge/releases/download/v0.5.0/ThunderBridge-v0.5.0-macOS-universal.dmg)，双击打开，将 **雷桥** 拖到 **Applications（应用程序）**。安装后推出磁盘映像，从「应用程序」启动。
 
 <p align="center"><img src="docs/images/install.png" width="720" alt="DMG 安装窗口：将雷桥图标拖到 Applications"></p>
 
@@ -63,7 +63,15 @@
 | :--- | :--- |
 | 双击进入对方目标目录，点击「上传文件…」选择项目，再点击「开始传输」。也可从 Finder 拖入，默认立即发送。 | 在对方列表中选择文件或文件夹，点击「下载所选…」，选择本机保存位置。支持 ⌘ / ⇧ 多选及右键下载。 |
 
-建议两端均使用 v0.4.1，与 v0.4.0 的传输协议兼容。也可使用其他可达的本地 IPv4 接口；自动发现与连接限定在所选网络，不会自动改走 Wi-Fi。
+建议两端均使用 v0.5.0，与 v0.4.0、v0.4.1 的传输协议兼容。也可使用其他可达的本地 IPv4 接口；自动发现与文件传输连接限定在所选网络，不会自动改走 Wi-Fi。
+
+### 04 · 一键打开屏幕共享
+
+连接设备后，点击 **屏幕共享**，雷桥会使用当前连接的对方地址，打开 Mac 自带的「屏幕共享」应用。查看屏幕、远程控制及登录授权均由 macOS 处理。
+
+对方需先在 **系统设置 → 通用 → 共享 → 屏幕共享** 中开启，并允许相应用户访问。连接时按系统提示登录；雷桥不会代为开启系统共享或保存 Mac 密码。[Apple 设置说明](https://support.apple.com/zh-cn/guide/mac-help/mh11848/mac/1000)
+
+屏幕共享是独立的系统会话。断开雷桥连接或停止文件共享后，屏幕共享仍可能保持连接；结束时请在系统「屏幕共享」应用中断开。
 
 ## 共享范围，由你开启
 
@@ -87,7 +95,9 @@
 
 v0.4.1 已通过 45 项自动化测试，覆盖本机 Bonjour 自动发现、无连接码双向传输、重连、停止共享、加密协商与原有文件传输流程。已在实际雷雳网桥上验证接口识别与限定接口监听。
 
-两台实体 Mac 的完整传输、吞吐量与长期稳定性仍待实测；Intel 与 macOS 13 兼容性目前仅完成交叉构建。README 中的截图使用独立演示数据。
+v0.5.0 已通过 50 项自动化测试，新增覆盖屏幕共享的真实 IPv4 地址解析、Bonjour 连接、重复点击、断线取消、设备变化和启动失败处理。
+
+两台实体 Mac 的完整传输、吞吐量、长期稳定性及实际屏幕共享会话仍待实测；Intel 与 macOS 13 兼容性目前仅完成交叉构建。README 中的截图使用 v0.4.1 独立演示数据。
 
 </details>
 

@@ -147,6 +147,16 @@ struct ContentView: View {
                                 Text("已连接 · 可上传与下载").font(.system(size: 11)).foregroundStyle(secondary)
                             }
                         }.padding(.vertical, 8)
+                        Button { model.openScreenSharing() } label: {
+                            HStack {
+                                if model.openingScreenSharing { ProgressView().controlSize(.small) }
+                                Label(model.openingScreenSharing ? "正在打开…" : "屏幕共享", systemImage: "rectangle.on.rectangle")
+                            }.frame(maxWidth: .infinity).padding(.vertical, 3)
+                        }
+                        .buttonStyle(.bordered).disabled(!model.canOpenScreenSharing)
+                        .help(model.peerAddress.map { "使用 Mac 自带的屏幕共享连接 \($0)" } ?? "未能取得对方地址，请重新连接设备。")
+                        Text("对方需在系统设置 → 通用 → 共享中开启“屏幕共享”。")
+                            .font(.system(size: 10)).foregroundStyle(secondary).fixedSize(horizontal: false, vertical: true)
                         Button("断开连接") { model.disconnect() }.disabled(model.running || model.preparing)
                     } else {
                         HStack(alignment: .top, spacing: 8) {
@@ -416,7 +426,7 @@ struct ContentView: View {
                 Label("同名自动另存", systemImage: "doc.on.doc")
                 Label("SHA-256 完整性校验", systemImage: "checkmark.shield")
                 Spacer()
-                Text("v0.4.1 · 自动连接")
+                Text("v0.5.0 · 自动连接")
             }.font(.system(size: 9)).foregroundStyle(secondary)
         }
     }

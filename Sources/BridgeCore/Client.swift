@@ -25,6 +25,8 @@ public struct PeerInfo: Sendable {
     public let id: String
     public let name: String
     public let home: String
+    /// Numeric address of the successful connection, never a Bonjour display name.
+    public let ipv4Address: String?
 }
 
 public struct DirectoryListing: Sendable {
@@ -131,7 +133,10 @@ public final class BridgeClient: @unchecked Sendable {
     }
 
     public func hello() async throws -> PeerInfo {
-        let reply = try await request(Message(command: "hello"))
+        let channel = try await connect()
+        defer { channel.close() }
+        try await channel.sendMessage(Message(command: "hello"))
+        let reply = try await channel.readMessage()
         guard reply.version == 4, let name = reply.machine, let home = reply.home,
               let id = reply.machineID, UUID(uuidString: id) != nil else {
             throw BridgeError("请将两台 Mac 的雷桥都升级到 0.4 或更新的兼容版本。")
@@ -139,7 +144,11 @@ public final class BridgeClient: @unchecked Sendable {
         if let expected = configuration.expectedPeerID, id != expected {
             throw BridgeError("发现的设备与实际连接的设备不一致，请刷新设备列表。")
         }
-        return PeerInfo(id: id, name: name, home: home)
+        let address: String?
+        if case .hostPort(host: .ipv4(let ipv4), port: _) = channel.connection.currentPath?.remoteEndpoint {
+            address = ipv4.rawValue.map { String($0) }.joined(separator: ".")
+        } else { address = nil }
+        return PeerInfo(id: id, name: name, home: home, ipv4Address: address)
     }
 
     public func list(_ path: String) async throws -> DirectoryListing {

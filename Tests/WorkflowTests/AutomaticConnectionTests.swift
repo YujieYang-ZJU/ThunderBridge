@@ -15,7 +15,8 @@ struct AutomaticConnectionTests {
 
     @Test func twoSharesDiscoverConnectTransferAndReconnectWithoutSendingPendingJobs() async throws {
         let root = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent(".test-fixture-auto-\(UUID())")
-        let first = AppModel(stateDirectory: root.appendingPathComponent("first-state"))
+        var screenSharingURLs: [URL] = []
+        let first = AppModel(stateDirectory: root.appendingPathComponent("first-state"), screenSharingOpener: { screenSharingURLs.append($0) })
         let second = AppModel(stateDirectory: root.appendingPathComponent("second-state"))
         defer { first.shutdown(); second.shutdown(); try? FileManager.default.removeItem(at: root) }
         first.localAddress = "127.0.0.1"; second.localAddress = "127.0.0.1"
@@ -24,6 +25,11 @@ struct AutomaticConnectionTests {
         #expect(first.error == nil && second.error == nil)
         #expect(first.nearbyPeers.count == 1 && second.nearbyPeers.count == 1)
         #expect(first.listeningPort != second.listeningPort)
+        #expect(first.peerAddress == "127.0.0.1" && second.peerAddress == "127.0.0.1")
+        #expect(first.canOpenScreenSharing && screenSharingURLs.isEmpty)
+        first.openScreenSharing()
+        try await wait { !first.openingScreenSharing }
+        #expect(screenSharingURLs.map(\.absoluteString) == ["vnc://127.0.0.1"])
         let remote = root.appendingPathComponent("remote"), local = root.appendingPathComponent("local")
         try FileManager.default.createDirectory(at: remote, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: local, withIntermediateDirectories: true)
@@ -45,6 +51,8 @@ struct AutomaticConnectionTests {
         second.stopSharing()
         try await wait { !first.connected && first.nearbyPeers.isEmpty }
         #expect(!second.sharing && !second.connected && first.sharing)
+        #expect(first.peerAddress == nil && second.peerAddress == nil)
+        #expect(!first.canOpenScreenSharing && !second.canOpenScreenSharing)
         first.preparing = true
         second.startSharing(on: "lo0")
         try await wait { first.nearbyPeers.count == 1 && second.connected }
