@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+    <key>CFBundleName</key><string>雷桥</string>
+    <key>CFBundleDisplayName</key><string>雷桥</string>
+    <key>CFBundleExecutable</key><string>ThunderBridge</string>
+    <key>CFBundleIdentifier</key><string>local.leibridge.ThunderBridge</string>
+    <key>CFBundlePackageType</key><string>APPL</string>
+    <key>CFBundleShortVersionString</key><string>0.4.1</string>
+    <key>CFBundleVersion</key><string>5</string>
+    <key>CFBundleIconFile</key><string>AppIcon</string>
+    <key>LSMinimumSystemVersion</key><string>13.0</string>
+    <key>LSApplicationCategoryType</key><string>public.app-category.utilities</string>
+    <key>NSHighResolutionCapable</key><true/>
+    <key>NSBonjourServices</key><array><string>_leibridge._tcp</string></array>
+    <key>NSLocalNetworkUsageDescription</key><string>在你开启共享后，通过所选本地网络自动发现另一台 Mac，浏览文件夹并双向传输文件。</string>
+    <key>NSDesktopFolderUsageDescription</key><string>读取你选择的桌面文件，或在开启共享后向对方显示桌面目录并接收文件。</string>
+    <key>NSDocumentsFolderUsageDescription</key><string>读取你选择的文稿文件，或在开启共享后向对方显示文稿目录并接收文件。</string>
+    <key>NSDownloadsFolderUsageDescription</key><string>读取你选择的下载文件，或在开启共享后向对方显示下载目录并接收文件。</string>
+    <key>NSRemovableVolumesUsageDescription</key><string>传输你选择的外置磁盘文件。</string>
+    <key>NSNetworkVolumesUsageDescription</key><string>传输你选择的网络磁盘文件。</string>
+</dict></plist>

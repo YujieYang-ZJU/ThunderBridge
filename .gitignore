@@ -1,0 +1,6 @@
+.build/
+.swiftpm/
+dist/
+.test-fixture-*
+.workflow-test-*
+.DS_Store
