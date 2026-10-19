@@ -18,4 +18,5 @@ iconutil -c icns .build/AppIcon.iconset -o "$APP_PATH/Contents/Resources/AppIcon
 codesign --force --sign - "$APP_PATH"
 codesign --verify --deep --strict "$APP_PATH"
 ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$OUTPUT_DIR/雷桥-macOS.zip"
+bash "$PROJECT_DIR/scripts/build-dmg.sh" "$APP_PATH" "$OUTPUT_DIR"
 echo "Created $APP_PATH"
