@@ -303,8 +303,8 @@ struct ContentView: View {
             .buttonStyle(.plain).foregroundStyle(secondary).disabled(model.loading)
     }
     private var remoteTable: some View {
-        Table(model.visibleEntries, selection: $model.selectedPaths) {
-            TableColumn("名称") { entry in
+        Table(model.visibleEntries, selection: $model.selectedPaths, sortOrder: $model.sortOrder) {
+            TableColumn("名称", sortUsing: RemoteEntryComparator(.name)) { entry in
                 HStack(spacing: 9) {
                     Image(systemName: entry.isDirectory ? "folder.fill" : "doc")
                         .foregroundStyle(entry.isDirectory ? accent : secondary).font(.system(size: 20)).frame(width: 24)
@@ -312,10 +312,10 @@ struct ContentView: View {
                     if entry.isSymbolicLink { Image(systemName: "arrow.turn.up.right").font(.caption) }
                 }.frame(height: 24).help(entry.path)
             }.width(min: 240, ideal: 400)
-            TableColumn("大小") { entry in
+            TableColumn("大小", sortUsing: RemoteEntryComparator(.size)) { entry in
                 Text(entry.isDirectory ? "文件夹" : formatBytes(entry.size)).font(.system(size: 12)).foregroundStyle(secondary)
             }.width(min: 75, ideal: 90, max: 110)
-            TableColumn("修改时间") { entry in
+            TableColumn("修改时间", sortUsing: RemoteEntryComparator(.modified)) { entry in
                 Text(entry.modified?.formatted(date: .numeric, time: .shortened) ?? "—")
                     .font(.system(size: 12)).foregroundStyle(secondary)
             }.width(min: 130, ideal: 160, max: 190)
@@ -426,7 +426,7 @@ struct ContentView: View {
                 Label("同名自动另存", systemImage: "doc.on.doc")
                 Label("SHA-256 完整性校验", systemImage: "checkmark.shield")
                 Spacer()
-                Text("v0.5.0 · 自动连接")
+                Text("v0.5.1 · 自动连接")
             }.font(.system(size: 9)).foregroundStyle(secondary)
         }
     }

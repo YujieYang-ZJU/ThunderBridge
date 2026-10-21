@@ -100,13 +100,15 @@ final class AppModel: ObservableObject {
     @Published var remoteHome = ""
     @Published var path = ""
     @Published var pathDraft = ""
-    @Published var entries: [RemoteEntry] = []
+    @Published var entries: [RemoteEntry] = [] { didSet { visibleEntriesCache = nil } }
+    @Published var sortOrder = [RemoteEntryComparator(.name)] { didSet { visibleEntriesCache = nil } }
+    private var visibleEntriesCache: [RemoteEntry]?
     @Published var selectedPaths = Set<String>()
     @Published var downloadDirectory = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)[0].path
     @Published var writable = false
     @Published var loading = false
-    @Published var showHidden = false
-    @Published var search = ""
+    @Published var showHidden = false { didSet { visibleEntriesCache = nil } }
+    @Published var search = "" { didSet { visibleEntriesCache = nil } }
     @Published var jobs: [TransferJob] = []
     @Published var favorites: [SavedDestination] = []
     @Published var presets: [DeliveryPreset] = []
@@ -202,7 +204,20 @@ final class AppModel: ObservableObject {
         } catch { self.error = "无法保存队列，下次启动可能无法恢复：\(error.localizedDescription)" }
     }
     var visibleEntries: [RemoteEntry] {
-        entries.filter { (showHidden || !$0.name.hasPrefix(".")) && (search.isEmpty || $0.name.localizedCaseInsensitiveContains(search)) }
+        if let visibleEntriesCache { return visibleEntriesCache }
+        let comparators = sortOrder + [RemoteEntryComparator(.name)]
+        let result = entries.filter {
+            (showHidden || !$0.name.hasPrefix(".")) && (search.isEmpty || $0.name.localizedCaseInsensitiveContains(search))
+        }.sorted { lhs, rhs in
+            for comparator in comparators {
+                let comparison = comparator.compare(lhs, rhs)
+                if comparison != .orderedSame { return comparison == .orderedAscending }
+            }
+            return lhs.path < rhs.path
+        }
+        // Transfer progress can redraw the table frequently; sort only when its inputs change.
+        visibleEntriesCache = result
+        return result
     }
     var pendingCount: Int { jobs.filter { $0.retryable && $0.peerID == peerID }.count }
     var canAdd: Bool { connected && !loading && writable && !preparing }

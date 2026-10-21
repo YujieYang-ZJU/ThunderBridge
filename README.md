@@ -8,7 +8,7 @@
     <img src="https://img.shields.io/badge/Apple_Silicon_%2B_Intel-Universal-5965DC?style=flat-square" alt="Apple Silicon 与 Intel 通用版">
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-6974DE?style=flat-square" alt="MIT License"></a>
   </p>
-  <p><a href="https://github.com/YujieYang-ZJU/ThunderBridge/releases/download/v0.5.0/ThunderBridge-v0.5.0-macOS-universal.dmg"><strong>下载 macOS 版 ↗</strong></a>　·　<a href="#开始使用">开始使用</a>　·　<a href="https://github.com/YujieYang-ZJU/ThunderBridge/releases">版本记录</a></p>
+  <p><a href="https://github.com/YujieYang-ZJU/ThunderBridge/releases/download/v0.5.1/ThunderBridge-v0.5.1-macOS-universal.dmg"><strong>下载 macOS 版 ↗</strong></a>　·　<a href="#开始使用">开始使用</a>　·　<a href="https://github.com/YujieYang-ZJU/ThunderBridge/releases">版本记录</a></p>
 </div>
 
 <br>
@@ -43,7 +43,7 @@
 
 ### 01 · 拖一下，安装完成
 
-下载 [ThunderBridge-v0.5.0-macOS-universal.dmg](https://github.com/YujieYang-ZJU/ThunderBridge/releases/download/v0.5.0/ThunderBridge-v0.5.0-macOS-universal.dmg)，双击打开，将 **雷桥** 拖到 **Applications（应用程序）**。安装后推出磁盘映像，从「应用程序」启动。
+下载 [ThunderBridge-v0.5.1-macOS-universal.dmg](https://github.com/YujieYang-ZJU/ThunderBridge/releases/download/v0.5.1/ThunderBridge-v0.5.1-macOS-universal.dmg)，双击打开，将 **雷桥** 拖到 **Applications（应用程序）**。安装后推出磁盘映像，从「应用程序」启动。
 
 <p align="center"><img src="docs/images/install.png" width="720" alt="DMG 安装窗口：将雷桥图标拖到 Applications"></p>
 
@@ -63,7 +63,9 @@
 | :--- | :--- |
 | 双击进入对方目标目录，点击「上传文件…」选择项目，再点击「开始传输」。也可从 Finder 拖入，默认立即发送。 | 在对方列表中选择文件或文件夹，点击「下载所选…」，选择本机保存位置。支持 ⌘ / ⇧ 多选及右键下载。 |
 
-建议两端均使用 v0.5.0，与 v0.4.0、v0.4.1 的传输协议兼容。也可使用其他可达的本地 IPv4 接口；自动发现与文件传输连接限定在所选网络，不会自动改走 Wi-Fi。
+v0.5.1 支持点击「名称」「大小」「修改时间」列标题排序，再次点击切换升序和降序，箭头显示当前方向。文件夹始终优先；名称采用自然排序，大小按实际字节数比较，未知修改时间排在同组末尾。刷新和切换目录会保留当前排序，重启应用后恢复名称升序。
+
+建议两端均使用 v0.5.1，与 v0.4.0、v0.4.1、v0.5.0 的传输协议兼容。也可使用其他可达的本地 IPv4 接口；自动发现与文件传输连接限定在所选网络，不会自动改走 Wi-Fi。
 
 ### 04 · 一键打开屏幕共享
 
@@ -96,6 +98,8 @@
 v0.4.1 已通过 45 项自动化测试，覆盖本机 Bonjour 自动发现、无连接码双向传输、重连、停止共享、加密协商与原有文件传输流程。已在实际雷雳网桥上验证接口识别与限定接口监听。
 
 v0.5.0 已通过 50 项自动化测试，新增覆盖屏幕共享的真实 IPv4 地址解析、Bonjour 连接、重复点击、断线取消、设备变化和启动失败处理。
+
+v0.5.1 已通过 56 项自动化测试，新增覆盖各列双向排序、名称中的数字、跨单位文件大小、未知日期、筛选与排序缓存更新，以及排序后选中文件的实际下载。
 
 两台实体 Mac 的完整传输、吞吐量、长期稳定性及实际屏幕共享会话仍待实测；Intel 与 macOS 13 兼容性目前仅完成交叉构建。README 中的截图使用 v0.4.1 独立演示数据。
 

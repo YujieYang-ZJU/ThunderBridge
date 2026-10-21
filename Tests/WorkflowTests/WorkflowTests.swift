@@ -43,6 +43,29 @@ final class WorkflowTests {
         try Data((name + "内容").utf8).write(to: url)
         return url
     }
+    @Test func sortedSelectionDownloadsTheSelectedFileAndSortSurvivesBrowsing() async throws {
+        defer { model.shutdown() }
+        let small = destination.appendingPathComponent("小文件.txt")
+        let large = destination.appendingPathComponent("大文件.txt")
+        try Data("小".utf8).write(to: small)
+        try Data(repeating: 42, count: 2048).write(to: large)
+        try await connect()
+        model.selectedPaths = [small.path]
+        model.sortOrder = [RemoteEntryComparator(.size, order: .reverse)]
+        #expect(model.visibleEntries.map(\.path) == [large.path, small.path])
+        #expect(model.selectedEntries.map(\.path) == [small.path])
+        let downloads = root.appendingPathComponent("sorted-downloads")
+        try FileManager.default.createDirectory(at: downloads, withIntermediateDirectories: true)
+        model.addDownloads(model.selectedEntries.map(\.path), to: downloads)
+        try await wait { !model.preparing && !model.running }
+        #expect(model.jobs.last?.state == "已完成")
+        #expect(try Data(contentsOf: downloads.appendingPathComponent(small.lastPathComponent)) == Data(contentsOf: small))
+        #expect(!FileManager.default.fileExists(atPath: downloads.appendingPathComponent(large.lastPathComponent).path))
+        model.browse(root.path); try await wait { !model.loading }
+        model.browse(destination.path); try await wait { !model.loading }
+        #expect(model.sortOrder == [RemoteEntryComparator(.size, order: .reverse)])
+        #expect(model.visibleEntries.map(\.path) == [large.path, small.path])
+    }
     @Test func queueSurvivesDisconnectAndRelaunchWithSharingOff() async throws {
         defer { model.shutdown() }
         try await connect()
